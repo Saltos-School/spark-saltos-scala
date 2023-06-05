@@ -7,10 +7,12 @@ object HolaSpark {
     val spark = SparkSession
       .builder
       .appName("HolaSpark")
-      .master("local[2]")
+      .master("local[*]")
       .getOrCreate()
-    val count = spark.sparkContext.parallelize(1 until 1000, 40).map { i =>
-        i * i
+    val numeros = 1 until 100
+    val count = spark.sparkContext.parallelize(numeros, 100).map { i =>
+      Thread.sleep(1000)
+      i * i
     }.reduce(_ + _)
     println(s"La suma de cuadrados del 1 al 100 es ${count}")
     spark.stop()
