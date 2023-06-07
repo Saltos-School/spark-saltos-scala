@@ -18,6 +18,9 @@ object PageRank {
       "/home/csaltos/Documents/spark-saltos-scala-main/src/main/resources/page_rank_sample01.txt")
     val enlacesTransformadoRDD = enlacesDS.rdd
 
+    // enlacesDirectoRDD.take(5).collect()
+    // enlacesDirectoRDD.takeSample()
+
     val enlacesTupla: RDD[(String, String)] = enlacesDirectoRDD map { enlace =>
       val campos = enlace.split(" ")
       (campos(0), campos(1))
