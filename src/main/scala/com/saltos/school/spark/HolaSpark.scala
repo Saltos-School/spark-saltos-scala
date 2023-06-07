@@ -13,7 +13,7 @@ object HolaSpark {
     val count = spark.sparkContext.parallelize(numeros, 100).map { i =>
       Thread.sleep(1000)
       i * i
-    }.reduce(_ + _)
+    }.reduce { _ + _ }
     println(s"La suma de cuadrados del 1 al 100 es ${count}")
     spark.stop()
   }
