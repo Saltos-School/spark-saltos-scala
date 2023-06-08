@@ -26,6 +26,11 @@ object PageRank {
       (campos(0), campos(1))
     }
 
+
+    // [(a, 1), (b, 2), (a, 5), (c, 6)] -> [(a, [1, 5]), (b, [2]), (c, [6])]
+    enlacesTupla.groupBy { case (k, v) =>
+      k
+    }
     val enlacesAgrupadoRDD = enlacesTupla.distinct().groupByKey().persist(StorageLevel.MEMORY_ONLY)
 
     println("DATOS:")
@@ -41,6 +46,16 @@ object PageRank {
 
     println("RANKING INICIAL:")
     rankingRDD.collect().foreach(println)
+
+    def loop(count: Int, rdd: RDD[String]): RDD[String] = {
+      if (count < 10) {
+        rdd
+      } else {
+        val nuevoRDD = rdd.map(_.toUpperCase())
+        loop(count + 1, nuevoRDD)
+      }
+    }
+    loop(0, enlacesDirectoRDD)
 
     for (i <- 1 to 10) {
       val enlacesTuplaInvertido = enlacesTupla map { case (key, value) =>
@@ -62,6 +77,9 @@ object PageRank {
       }
       contribucionRDD.collect().foreach(println)
       // contribucionRDD.groupByKey()
+      contribucionRDD.reduce { case ((k1, v1), (k2, v2)) =>
+        (k1, v1 + v2)
+      }
       rankingRDD = contribucionRDD.reduceByKey(_ + _).mapValues(rank => 0.15 + 0.85 * rank)
     }
 
