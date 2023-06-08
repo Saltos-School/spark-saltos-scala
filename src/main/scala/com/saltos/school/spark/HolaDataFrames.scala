@@ -73,6 +73,18 @@ object HolaDataFrames {
     personasDS2.show()
     personasDS2.printSchema()
 
+    val personasJsonDF = spark.read.json("src/main/resources/people.json")
+    personasJsonDF.show()
+    personasJsonDF.printSchema()
+
+    val nameField = DataTypes.createStructField("name", DataTypes.StringType, true)
+    val ageField = DataTypes.createStructField("age", DataTypes.LongType, true)
+    val peopleSchema = DataTypes.createStructType(Array(nameField, ageField))
+
+    val personasJsonDF2 = spark.createDataFrame(personasJsonDF.rdd, peopleSchema)
+    personasJsonDF2.show()
+    personasJsonDF.printSchema()
+
     spark.stop()
   }
 }
