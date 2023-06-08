@@ -79,7 +79,7 @@ object HolaDataFrames {
 
     val nameField = DataTypes.createStructField("name", DataTypes.StringType, true)
     val ageField = DataTypes.createStructField("age", DataTypes.LongType, true)
-    val peopleSchema = DataTypes.createStructType(Array(nameField, ageField))
+    val peopleSchema = DataTypes.createStructType(Array(ageField, nameField))
 
     val personasJsonDF2 = spark.createDataFrame(personasJsonDF.rdd, peopleSchema)
     personasJsonDF2.show()
