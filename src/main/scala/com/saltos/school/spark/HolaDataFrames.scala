@@ -50,7 +50,7 @@ object HolaDataFrames {
       // val nombre = personaRow(0)
       // val nombre2 = personaRow.get(0)
       // val nombre3 = personaRow.getAs[String]("nombre")
-      // val nombre4 = personaRow.getString(4)
+      // val nombre4 = personaRow.getString(0)
       val edad = personaRow.getAs[Long]("edad")
       edad > 21
     }
@@ -62,6 +62,16 @@ object HolaDataFrames {
     // personasDS.filter("edad > 21")
     println("Mayores de edad:")
     mayoresDeEdadDS.show()
+
+    val personasRecordRDD = personasRDD.map { linea =>
+      val campos = linea.split(",")
+      val nombre = campos(0).trim
+      val edad = campos(1).trim.toLong
+      Persona2(nombre, edad)
+    }
+    val personasDS2 = personasRecordRDD.toDS()
+    personasDS2.show()
+    personasDS2.printSchema()
 
     spark.stop()
   }
