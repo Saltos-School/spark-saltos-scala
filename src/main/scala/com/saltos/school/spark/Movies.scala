@@ -3,6 +3,7 @@ package com.saltos.school.spark
 import org.apache.kafka.common.config.LogLevelConfig
 import org.apache.spark.sql.{Encoders, RowFactory, SparkSession}
 import org.apache.spark.sql.types.DataTypes
+import org.apache.spark.storage.StorageLevel
 
 object Movies {
   def main(args: Array[String]): Unit = {
@@ -19,13 +20,30 @@ object Movies {
 
     val dataPath = "/home/csaltos/Documents/ml-latest-small/"
 
-    val moviesDF = loadMoviesDF(spark, dataPath)
+    val moviesDF = loadMoviesDF(spark, dataPath).cache()
     moviesDF.show()
     moviesDF.printSchema()
 
-    val ratingsDF = loadRatingsDF(spark, dataPath)
+    val ratingsDF = loadRatingsDF(spark, dataPath).cache()
     ratingsDF.show()
     ratingsDF.printSchema()
+
+    val moviesWithRatings = moviesDF.join(ratingsDF, "movieId")
+    moviesWithRatings.show()
+    moviesWithRatings.printSchema()
+
+    val userId = "5"
+    val userMoviesRatings = moviesWithRatings.filter("userId = " + userId).cache()
+    userMoviesRatings.show()
+    println("Ratings por usuario: " + userMoviesRatings.count())
+
+    import org.apache.spark.sql.functions.desc
+    val userMoviesTopRatings = userMoviesRatings.sort(desc("rating"))
+    userMoviesTopRatings.show(1000)
+
+    val userMoviesTop10Ratings = userMoviesTopRatings.take(10)
+    println("El top 10 de películas del usuario " + userId + " es:")
+    userMoviesTop10Ratings.foreach(println)
 
     spark.stop()
   }
