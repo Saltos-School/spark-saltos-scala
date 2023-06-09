@@ -43,7 +43,11 @@ object Movies {
 
     val userMoviesTop10Ratings = userMoviesTopRatings.take(10)
     println("El top 10 de películas del usuario " + userId + " es:")
-    userMoviesTop10Ratings.foreach(println)
+    userMoviesTop10Ratings.foreach { movieRow =>
+      val title = movieRow.get(1)
+      val rating = movieRow.getAs[Double]("rating")
+      println("Titulo: " + title + ", Estrellas: " + rating)
+    }
 
     spark.stop()
   }
