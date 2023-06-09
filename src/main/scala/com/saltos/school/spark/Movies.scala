@@ -7,6 +7,14 @@ import org.apache.spark.storage.StorageLevel
 
 object Movies {
   def main(args: Array[String]): Unit = {
+
+    val userId = if (args.isEmpty) "5" else args(0)
+
+    val env = System.getProperty("movies.env")
+
+    val isDevelopment = env == "dev"
+    val isProduction = !isDevelopment
+
     val spark = SparkSession
       .builder
       .appName(getClass.getSimpleName)
@@ -16,9 +24,11 @@ object Movies {
 
     import spark.implicits._
 
-    sc.setLogLevel(LogLevelConfig.WARN_LOG_LEVEL)
+    if (isProduction) {
+      sc.setLogLevel(LogLevelConfig.WARN_LOG_LEVEL)
+    }
 
-    val dataPath = "/home/csaltos/Documents/ml-latest-small/"
+    val dataPath = if (isProduction) "/home/csaltos/Documents/ml-25m/" else "/home/csaltos/Documents/ml-latest-small/"
 
     val moviesDF = loadMoviesDF(spark, dataPath).cache()
     moviesDF.show()
@@ -38,7 +48,6 @@ object Movies {
 
     // val moviesWithRatingsAndLinks = moviesWithRatings.join(linksDF, "movieId")
 
-    val userId = "5"
     val userMoviesRatings = moviesWithRatings.filter("userId = " + userId).cache()
     userMoviesRatings.show()
     println("Ratings por usuario: " + userMoviesRatings.count())
