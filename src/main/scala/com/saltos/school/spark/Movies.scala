@@ -65,13 +65,17 @@ object Movies {
     val userMoviesTopRatings = userMoviesRatingsWithLinks.sort(desc("rating"))
     userMoviesTopRatings.show(1000)
 
-    val userMoviesTop10Ratings = userMoviesTopRatings.take(10)
-    println("El top 10 de películas del usuario " + userId + " es:")
-    userMoviesTop10Ratings.foreach { movieRow =>
-      val title = movieRow.get(1)
-      val rating = movieRow.getAs[Double]("rating")
-      val imdbId = movieRow.getAs[String]("imdbId")
-      println("Titulo: " + title + ", Estrellas: " + rating + ", Link: http://www.imdb.com/title/tt" + imdbId + "/")
+    if (isDevelopment) {
+      val userMoviesTop10Ratings = userMoviesTopRatings.take(10)
+      println("El top 10 de películas del usuario " + userId + " es:")
+      userMoviesTop10Ratings.foreach { movieRow =>
+        val title = movieRow.get(1)
+        val rating = movieRow.getAs[Double]("rating")
+        val imdbId = movieRow.getAs[String]("imdbId")
+        println("Titulo: " + title + ", Estrellas: " + rating + ", Link: http://www.imdb.com/title/tt" + imdbId + "/")
+      }
+    } else {
+      userMoviesTopRatings.limit(10).write.json(dataPath + "output/topratings/user/" + userId)
     }
 
     spark.stop()
