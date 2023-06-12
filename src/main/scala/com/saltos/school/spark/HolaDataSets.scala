@@ -37,7 +37,7 @@ object HolaDataSets {
         Cuenta(3, "pepe3@prueba.com")
       )).toDS()
 
-    val personasConCuentasDS = personaDS.join(cuentasDS, "id", "inner")
+    val personasConCuentasDS = personaDS.join(cuentasDS, "id")
     personasConCuentasDS.show()
 
     personaDS.agg(Map("edad" -> "min")).show

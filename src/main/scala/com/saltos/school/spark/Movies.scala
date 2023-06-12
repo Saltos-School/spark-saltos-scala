@@ -28,7 +28,7 @@ object Movies {
       sc.setLogLevel(LogLevelConfig.WARN_LOG_LEVEL)
     }
 
-    val dataPath = if (isProduction) "/home/csaltos/Documents/ml-25m/" else "/home/csaltos/Documents/ml-latest-small/"
+    val dataPath = if (isProduction) "s3://spark-saltos-school-data/ml-25m/" else "/home/csaltos/Documents/ml-latest-small/"
 
     val moviesDF = loadMoviesDF(spark, dataPath).cache()
     moviesDF.show()
