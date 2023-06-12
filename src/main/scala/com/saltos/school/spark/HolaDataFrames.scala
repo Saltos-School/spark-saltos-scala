@@ -1,7 +1,7 @@
 package com.saltos.school.spark
 
 import org.apache.kafka.common.config.LogLevelConfig
-import org.apache.spark.sql.{Encoders, RowFactory, SparkSession}
+import org.apache.spark.sql.{Encoders, RowFactory, SparkSession, Row}
 import org.apache.spark.sql.types.DataTypes
 
 case class Persona2(nombre: String, edad: Long)
@@ -31,7 +31,7 @@ object HolaDataFrames {
       val campos = linea.split(",")
       val nombre = campos(0).trim
       val edad = campos(1).trim.toLong
-      RowFactory.create(nombre, edad)
+      Row(nombre, edad)
     }
 
     val personasDF = spark.createDataFrame(personasRowRDD, personaSchema)
