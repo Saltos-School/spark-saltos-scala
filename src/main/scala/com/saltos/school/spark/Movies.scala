@@ -28,7 +28,7 @@ object Movies {
       sc.setLogLevel(LogLevelConfig.WARN_LOG_LEVEL)
     }
 
-    val dataPath = if (isProduction) "/home/csaltos/Documents/ml-25m/" else "/home/csaltos/Documents/ml-latest-small/"
+    val dataPath = if (isProduction) "s3://spark-saltos-school-data/ml-25m/" else "/home/csaltos/Documents/ml-latest-small/"
 
     val moviesDF = loadMoviesDF(spark, dataPath).cache()
     moviesDF.show()
@@ -65,13 +65,17 @@ object Movies {
     val userMoviesTopRatings = userMoviesRatingsWithLinks.sort(desc("rating"))
     userMoviesTopRatings.show(1000)
 
-    val userMoviesTop10Ratings = userMoviesTopRatings.take(10)
-    println("El top 10 de películas del usuario " + userId + " es:")
-    userMoviesTop10Ratings.foreach { movieRow =>
-      val title = movieRow.get(1)
-      val rating = movieRow.getAs[Double]("rating")
-      val imdbId = movieRow.getAs[String]("imdbId")
-      println("Titulo: " + title + ", Estrellas: " + rating + ", Link: http://www.imdb.com/title/tt" + imdbId + "/")
+    if (isDevelopment) {
+      val userMoviesTop10Ratings = userMoviesTopRatings.take(10)
+      println("El top 10 de películas del usuario " + userId + " es:")
+      userMoviesTop10Ratings.foreach { movieRow =>
+        val title = movieRow.get(1)
+        val rating = movieRow.getAs[Double]("rating")
+        val imdbId = movieRow.getAs[String]("imdbId")
+        println("Titulo: " + title + ", Estrellas: " + rating + ", Link: http://www.imdb.com/title/tt" + imdbId + "/")
+      }
+    } else {
+      userMoviesTopRatings.limit(10).write.json(dataPath + "output/topratings/user/" + userId)
     }
 
     spark.stop()

@@ -1,6 +1,6 @@
 package com.saltos.school.spark
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{Encoders, SparkSession}
 
 object HolaSparkPaul {
   def main(args: Array[String]): Unit = {
@@ -13,7 +13,15 @@ object HolaSparkPaul {
       Thread.sleep(1000)
       i * i
     }.reduce { _ + _ }
-    println(s"La suma de cuadrados del 1 al 100 es ${count}")
+
+    val resultRDD = spark.sparkContext.parallelize(Seq(s"La suma de cuadrados del 1 al 100 es ${count}"))
+
+    resultRDD.saveAsTextFile("s3://spark-saltos-school-data/text/output/result")
+
+    val resultDS = spark.createDataset(Seq(s"La suma de cuadrados del 1 al 100 es ${count}"))(Encoders.STRING)
+
+    resultDS.write.json("s3://spark-saltos-school-data/hola/output/result")
+
     spark.stop()
   }
 }
